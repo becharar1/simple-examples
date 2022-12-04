@@ -1,0 +1,1 @@
+https://docs.influxdata.com/telegraf/v1.23/release-notes-changelog/#output-data-formats-serializers
