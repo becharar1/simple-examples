@@ -1,0 +1,10 @@
+apiVersion: 1
+
+datasources:
+
+  - name: Influx
+    type: influxdb
+    
+    access: server
+    url: influxdb:8086
+
