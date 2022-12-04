@@ -1,0 +1,42 @@
+version: '3.7'
+services:
+
+  cortex:
+    image: cortexproject/cortex:v1.8.1
+    volumes:
+      - ./cortex-config.yml:/etc/cortex-config/cortex.yaml
+    entrypoint:
+      - /bin/cortex
+      - -config.file=/etc/cortex-config/cortex.yaml
+    ports:
+      - "9009:9009"
+
+  agent:
+    image: grafana/agent:latest
+    volumes:
+      - ./agent-config.yml:/etc/agent-config/agent.yaml
+    entrypoint:
+      - /bin/agent
+      - -config.file=/etc/agent-config/agent.yaml
+      - -metrics.wal-directory=/tmp/agent/wal
+      - -config.expand-env
+      - -config.enable-read-api
+    environment:
+      - MYSQL_HOST= localhost:3306
+    #volumes:
+      #- //var/run/docker.sock://var/run/docker.sock
+    ports:
+      - "12345:12345"
+    depends_on:
+      - cortex
+
+  grafana:
+    image: grafana/grafana
+    volumes:
+      - ./grafanaprovisioning/datasources:/etc/grafana/provisioning/datasources
+    ports:
+      - "3000:3000"
+    links:
+      - cortex
+volumes:
+  mysql_db_data_container1:
