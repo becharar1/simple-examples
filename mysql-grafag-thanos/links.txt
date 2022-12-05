@@ -1,0 +1,4 @@
+https://github.com/grafana/agent/blob/main/example/docker-compose/agent/config/agent.yaml
+https://github.com/prometheus/mysqld_exporter/issues/440
+https://github.com/prometheus/mysqld_exporter
+https://grafana.com/docs/agent/next/configuration/integrations/mysqld-exporter-config/
