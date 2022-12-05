@@ -1,0 +1,15 @@
+apiVersion: 1
+
+deleteDatasources:
+  - name: Cortex
+
+datasources:
+- name: Thanos
+  type: prometheus
+  access: server
+  orgId: 1
+  url: http://query0:10904
+  basicAuth: false
+  isDefault: false
+  version: 1
+  editable: false
