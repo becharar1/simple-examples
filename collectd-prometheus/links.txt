@@ -1,0 +1,1 @@
+https://github.com/camptocamp/stack-metrics/blob/master/composition/metrics/docker-compose.yml

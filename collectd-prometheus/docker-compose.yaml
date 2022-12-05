@@ -1,0 +1,31 @@
+version: '3'
+services:
+  collectd:
+    image: fr3nd/collectd
+    privileged: true
+    network_mode: host
+    volumes:
+      - /proc:/mnt/proc:ro
+      - ./collectd.conf:/etc/collectd/collectd.conf
+  collprom:
+    image: prom/collectd-exporter
+    ports:
+      - "9103:9103"
+      - "25826:25826/udp"
+    command:
+    - --collectd.listen-address=:25826
+  grafana:
+    image: grafana/grafana
+    container_name: grafana-server
+    restart: always
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./grafanaprovisioning/datasources:/etc/grafana/provisioning/datasources
+      - ./grafanaprovisioning/dashboards:/etc/grafana/provisioning/dashboards
+      - grafana_data:/var/lib/grafana
+      - ./grafana-data:/var/lib/grafana
+
+volumes:
+  grafana_data: {}
+  influxdb_data: {}
