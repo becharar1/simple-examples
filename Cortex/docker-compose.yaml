@@ -1,0 +1,140 @@
+version: "3.7"
+services:
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafanaprovisioning/datasources:/etc/grafana/provisioning/datasources
+    depends_on:
+      - cortex1
+      - prometheus2
+      - cortex2
+      - prometheus
+      - cortex3
+
+  prometheus:
+    image: prom/prometheus
+    ports:
+       - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    depends_on: 
+      - cortex2
+
+
+  prometheus2:
+    image: prom/prometheus
+    volumes:
+      - ./prometheus2.yml:/etc/prometheus/prometheus.yml
+    depends_on: 
+      - cortex1    
+
+
+  prometheus3:
+    image: prom/prometheus
+    volumes:
+      - ./prometheus3.yml:/etc/prometheus/prometheus.yml
+    depends_on: 
+      - cortex3
+
+
+  telegrafcpu:
+    image: telegraf:latest
+    container_name: telegrafcpu
+    volumes:
+    - ./telegrafcpu.conf:/etc/telegraf/telegraf.conf:ro
+    - //var/run/docker.sock://var/run/docker.sock
+    restart: always
+    ports:
+    - '8125:8125'
+    depends_on:
+      - cortex3
+
+
+  telegrafdocker:
+    image: telegraf:latest
+    container_name: telegrafdocker
+    volumes:
+    - ./telegrafdocker.conf:/etc/telegraf/telegraf.conf:ro
+    - //var/run/docker.sock://var/run/docker.sock
+    restart: always
+    depends_on:
+      - cortex3
+
+  telegrafsql:
+    image: telegraf:latest
+    container_name: telegrafsql
+    volumes:
+    - ./Telegrafmysql.conf:/etc/telegraf/telegraf.conf:ro
+    - //var/run/docker.sock://var/run/docker.sock
+    restart: always
+    depends_on:
+      - cortex3
+
+  consul:
+    image: consul
+    restart: on-failure
+
+  cortex1:
+    image: quay.io/cortexproject/cortex:v0.1.0
+    restart: on-failure
+    ports:
+      - "9009:9009"
+    volumes:
+      - "./single-process-config.yaml:/etc/single-process-config.yaml"
+    command: [
+      "-config.file=/etc/single-process-config.yaml",
+      "-ring.store=consul",
+      "-consul.hostname=consul:8500",
+      "-distributor.replication-factor=3",
+      ]
+
+
+  cortex2:
+    image: quay.io/cortexproject/cortex:v0.1.0
+    restart: on-failure
+    volumes:
+      - "./single-process-config.yaml:/etc/single-process-config.yaml"
+    command: [
+      "-config.file=/etc/single-process-config.yaml",
+      "-ring.store=consul",
+      "-consul.hostname=consul:8500",
+      "-distributor.replication-factor=3"
+      ]
+
+
+  cortex3:
+    image: quay.io/cortexproject/cortex:v0.1.0
+    restart: on-failure
+    volumes:
+      - "./single-process-config.yaml:/etc/single-process-config.yaml"
+    command: [
+      "-config.file=/etc/single-process-config.yaml",
+      "-ring.store=consul",
+      "-consul.hostname=consul:8500",
+      "-distributor.replication-factor=3"
+      ]
+
+  mysql_container:
+    image: mysql:latest
+    container_name: mysql_container
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpassword
+    ports:
+      - 3306:3306
+      - 33060:33060
+    volumes:
+      - mysql_db_data_container1:/var/lib/mysql
+
+  adminer_container:
+    image: adminer:latest
+    environment:
+      ADMINER_DEFAULT_SERVER: mysql_container
+    ports:
+      - 8080:8080
+
+volumes:
+  mysql_db_data_container1: {}
+
