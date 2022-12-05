@@ -1,0 +1,21 @@
+apiVersion: 1
+
+datasources:
+
+  - name: Influx_collectd
+    type: influxdb
+    access: server
+    url: influxdb:8086
+    database: collectd
+    httpMode: Get
+    editable: true
+
+
+
+  - name: Influx-telegraf
+    type: influxdb
+    access: server
+    editable: true
+    database: influx
+    HTTP mode: Get
+    url: influxdb:8086
